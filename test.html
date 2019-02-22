@@ -83,7 +83,7 @@
 			}
 
 			class Gif {
-				constructor(type = '', id = '', slug = '', url = '', bitly_gif_url = '', bitly_url = '', embed_url = '', username = '', source = '', rating = '', caption = '', content_url = '', source_tld = '', source_post_url = '', import_datetime = '', trending_datetime = '', images = [], title = '',){
+				constructor(type = '', id = '', slug = '', url = '', bitly_gif_url = '', bitly_url = '', embed_url = '', username = '', source = '', rating = '', caption = '', content_url = '', source_tld = '', source_post_url = '', is_sticker = '0', import_datetime = '', trending_datetime = '', images = [], title = '',){
 					
 					this.type = type;
 			        this.id = id;
@@ -99,6 +99,7 @@
 			        this.content_url = content_url;
 			        this.source_tld = source_tld;
 			        this.source_post_url = source_post_url;
+			        this.is_sticker = is_sticker;
 			        this.import_datetime = import_datetime;
 			        this.trending_datetime = trending_datetime;
 			        this.images = images;
@@ -111,7 +112,7 @@
 			var li;
 
 			var xhr = new XMLHttpRequest();
-			xhr.open("GET", "http://api.giphy.com/v1/gifs/search?q=kitten&api_key=" + api_key+ "&limit=10", true);
+			xhr.open("GET", "http://api.giphy.com/v1/gifs/search?q=kitten&api_key=" + api_key+ "&limit=5", true);
 			xhr.onload = function (e) {
 			  if (xhr.readyState === 4) {
 			    if (xhr.status === 200) {
@@ -147,40 +148,72 @@
 
 			    	
 			    	data = xhr.responseText;
-			    	ns = 17;
+			    	ns = 0;
 			    	ne = ns;
 			    	li = [];
-			    	for (var i = 0; i < 16; i++)
-			    	{	
-				    	if (i == 0)
-				    	{
-				    		ne = data.indexOf('"',ne+1);
-				    		li.push(data.slice(ns+1,ne));
+
+			    	function object_parse (li, ns = 0, ne = 0)
+			    	{
+				    	while (ns != -1 & ne != -1)
+				    	{	
+				    		var nb = data.indexOf("{",ns);
+				    		ns = data.indexOf(":",ns);
+				    		if ("{" == data[ns+1] || "{" == data[ns+2] ){
+				    			ns = ns+2
+				    			l = [];
+				    			console.log(li)
+				    			var temp = object_parse(l,ns,ne);
+				    			ns = temp[0];
+				    			ne = temp[1];
+				    			li.push(l);
+				    		}
+				    		/* something with 
+				    		|| "{" == data[data.indexOf(",",ne) +1]
+				    		*/
+
+				    		ne = ns;
+				    		nb = data.indexOf("}",ns);
+				    		ne = data.indexOf(",",ne);
+				    		if (nb < ne)
+				    		{
+				    			ne = nb;
+				    			var l = data.slice(ns+1,ne);
+					    		if(l[0] == '"')
+					    		{
+					    			l = l.substr(1);
+					    		}
+					    		if(l[l.length-1] == '"')
+					    		{
+					    			l = l.slice(0,l.length-1);
+					    		}
+
+					    		li.push(l);
+					    		ns = ne;
+					    		if (ns == -1 || ne == -1)
+					    		{
+					    			ns = data.length;
+					    			ne = data.length;
+					    			console.log("end")
+					    		}
+					    		return [ns+1,ne+1];
+				    		}
+
+				    		var l = data.slice(ns+1,ne);
+				    		if(l[0] == '"')
+				    		{
+				    			l = l.substr(1);
+				    		}
+				    		if(l[l.length-1] == '"')
+				    		{
+				    			l = l.slice(0,l.length-1);
+				    		}
+
+				    		li.push(l);
 				    		ns = ne;
-					    	ne = data.indexOf('"',ne+1);
 				    	}
-				    	else if (i == 13)
-				    	{
-					    	ns = ne;
-					    	ne = data.indexOf('"',ne+1);
-					    	ns = ne;
-					    	ne = data.indexOf('"',ne+1);
-				    		li.push(data.slice(ns+2,ne-1));
-				    	}
-				    	else
-				    	{
-				    		
-					    	ns = ne;
-					    	ne = data.indexOf('"',ne+1);
-					    	ns = ne;
-					    	ne = data.indexOf('"',ne+1);
-					    	ns = ne;
-					    	ne = data.indexOf('"',ne+1);
-				    		li.push(data.slice(ns+1,ne));
-				    		ns = ne;
-					    	ne = data.indexOf('"',ne+1);
-				    	}
-			    	}
+				    	return [ns+1,ne+1];
+				    }
+				    object_parse(li,ns,ne);
 			    	
 
 
