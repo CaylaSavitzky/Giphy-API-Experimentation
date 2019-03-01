@@ -116,32 +116,31 @@
 				var xhr = new XMLHttpRequest();
 				xhr.open("GET", search_request, true);
 				xhr.onload = function (e) {
-				  	if (xhr.readyState === 4) {
-				    	if (xhr.status === 200) {
+				  if (xhr.readyState === 4) {
+				    if (xhr.status === 200) {
 
 		/*	COLLECT AND FORMAT IMAGES & METADATA*/
 
+				    	/* GATHER SEARCH RESULTS AND CREATE ARRAY OF ORIGINAL GIPH URLS */
+				      search_results.push(xhr.responseText);
+				      giph_src_array.push.apply(giph_src_array, search_results[0].match(giph_src_original_regex));
 
+				        /* CLEAN ARRAY SO EACH ELEMENT IS FORMATTED: "https://.... ... ... .giph" */
 
-					    	/* GATHER SEARCH RESULTS AND CREATE ARRAY OF ORIGINAL GIPH URLS */
-						    search_results.push(xhr.responseText);
-						    giph_src_array.push.apply(giph_src_array, search_results[0].match(giph_src_original_regex));
-
-						        /* CLEAN ARRAY SO EACH ELEMENT IS FORMATTED: "https://.... ... ... .giph" */
-
-						    giph_details_array = []
-						    giph_src_array.forEach(function(element) {
-						      	element_details = [];
-						      	element_details.push(cleanurl(between_strings(element,'height":"','"')));
-						      	element_details.push(cleanurl(between_strings(element,'width":"','"')));
-						      	element_details.push(cleanurl(between_strings(element,'url":"','"')));
-						      	element_details.push(cleanurl(between_strings(element,'mp4":"','"')));
-						      	giph_details_array.push(element_details);
-						    });
+				      giph_details_array = []
+				      giph_src_array.forEach(function(element) {
+				      	element_details = [];
+				      	element_details.push(cleanurl(between_strings(element,'height":"','"')));
+				      	element_details.push(cleanurl(between_strings(element,'width":"','"')));
+				      	element_details.push(cleanurl(between_strings(element,'url":"','"')));
+				      	element_details.push(cleanurl(between_strings(element,'mp4":"','"')));
+				      	giph_details_array.push(element_details);
+				      });
 
 		/*	POST GIPHS	*/
 
 					  resize_function();
+					  console.log(giph_details_array);
 
 
 				    } else {
