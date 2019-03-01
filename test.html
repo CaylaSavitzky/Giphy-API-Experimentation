@@ -4,25 +4,35 @@
 		<script>
 			var api_key = "ZiWvaBkvD0BNtOACTwJelb1CDZXJGWyE";
 		</script>
-	</head>
-	<body>
-	<!--
-		<img src = "http://media2.giphy.com/media/FiGiRei2ICzzG/giphy.gif">
+		<style>
+			body {
+				background:black;
+				display: flex;
+				align-items: flex-start;
+				justify-content: center;
+				flex-wrap:wrap;
+			}
+			img, iframe {
+				border: 1px solid 777;
+				width:200px;
+				margin: 15px 0 15px 0;
+			}
 
-		<iframe width="420" height="315"
-			src="https:\/\/giphy.com\/embed\/pjnfNhaFmkhxu">
-		</iframe>
-	-->
-	<div id = "giphs_container">
+			.giphs_container {
+				margin:0 15px 0 15px;
+				width:200px;
+			}
 
-
-	</div>
-
-
+		</style>
 		<script>
 			var search_results = [];
-			var giphs_container = document.getElementById("giphs_container");
-			var giph_src_regex = /original":{("url":".*?")/g;
+			var giphs_container = document.getElementsByClassName("giphs_container");
+			var giph_src_original_url_regex = /original":{("url":".*?")/g;
+			var giph_src_original_regex = /original":{.*?}/g;
+			var search_items = "kittens";
+			var view_number = 25;
+			var view_loads = 1;
+
 			var giph_src_array = []
 			function cleanurl (url)
 			{
@@ -34,62 +44,118 @@
 			    return url;
 			}
 
-			var xhr = new XMLHttpRequest();
-			xhr.open("GET", "http://api.giphy.com/v1/gifs/search?q=kitten&api_key=" + api_key+ "&limit=5", true);
-			xhr.onload = function (e) {
-			  if (xhr.readyState === 4) {
-			    if (xhr.status === 200) {
+			function between_strings(element, start_item,end_item)
+			{
+				var start_loc = element.indexOf(start_item) + start_item.length;
+			    var end_loc = element.indexOf(end_item,start_loc);
+			    return element.slice(start_loc,end_loc);
+			}
 
-	/*
-	!
-	!
-	!
-	!
-	COLLECT AND FORMAT IMAGES & METADATA
-	!
-	!
-	!
-	!
-	*/
+			function test_resize_need (){
+				var two_col = 245;
+			  	var col_width = 230;
+			  	var col_number = 1;
+			  	var screenwidth = window.innerWidth;
+			  	var next_total = two_col + col_number*col_width;
+			  	while (screenwidth>next_total){
+					col_number++;
+				  	next_total = two_col + col_number*col_width;
+				  	if (screenwidth < next_total){
+				  		return col_number;
+				  	}
+				  	
+				}
+			}
 
-			    	/* GATHER SEARCH RESULTS AND CREATE ARRAY OF ORIGINAL GIPH URLS */
-			      search_results.push(xhr.responseText);
-			      giph_src_array.push.apply(giph_src_array, search_results[0].match(giph_src_regex));
+			function set_giphs_container (){
+			  	var body = document.body;
+			  	body.innerHTML = '';
+			  	var two_col = 245;
+			  	var col_width = 230;
+			  	var col_number = 1;
+			  	var screenwidth = window.innerWidth;
+			  	var next_total = two_col + col_number*col_width;
+			  	while (screenwidth>next_total){
+					col_number++;
+				  	next_total = two_col + col_number*col_width;
+				  	if (screenwidth < next_total){
+				  		for (i = 0; i < col_number; i++){
+				  			body.innerHTML = body.innerHTML + '<div class = "giphs_container"></div>';
+				  		}
+				  	}
+				}
+				if (col_number == 1){
+				  		for (i = 0; i < col_number; i++){
+				  			body.innerHTML = body.innerHTML + '<div class = "giphs_container"></div>';
+				  		}
+				  	}
+			  	var giphs_containers = document.getElementsByClassName("giphs_container");
+			  	return giphs_containers;
+			}
 
-			        /* CLEAN ARRAY SO EACH ELEMENT IS FORMATTED: "https://.... ... ... .giph" */
-			      temp_array = [];
-			      giph_src_array.forEach(function(element) {
-			      	temp_array.push(cleanurl(element.substr(17)));
-			      	console.log(element);
-			      });
-			      giph_src_array = temp_array;
-
-	/*
-	!
-	!
-	!
-	POST GIPHS
-	!
-	!
-	!
-	*/
-
-			        /* POST GIPHS IN SUITABLE FASHION */
-			      giph_src_array.forEach(function(element){
-					  giphs_container.innerHTML = giphs_container.innerHTML + '<img src=' + element + '>';
-					});
-
-
-			    } else {
-			      console.error(xhr.statusText);
-			    }
+			function distribute_giphs (giph_details_array,giphs_container){
+		  		var i = 0;
+		  		var giph_columns = giphs_container.length;
+		        /* POST GIPHS IN SUITABLE FASHION */
+		        giph_details_array.forEach(function(element){
+					giphs_container[i%giph_columns].innerHTML = giphs_container[i%giph_columns].innerHTML + '<img src=' + element[2] + '>';
+					i++;
+				});	
 			  }
-			};
-			xhr.onerror = function (e) {
-			  console.error(xhr.statusText);
-			};
-			xhr.send(null);
 
+		  	function resize_function (){
+				if (test_resize_need() != giphs_container.length){
+				  	giphs_container = set_giphs_container();
+					distribute_giphs(giph_details_array,giphs_container);
+					console.log('resize');
+				}
+		  	}
+
+			function giph_request(items,number){
+				search_request = "http://api.giphy.com/v1/gifs/search?q="+search_items+"&api_key=" + api_key+ "&limit="+view_number;
+				var xhr = new XMLHttpRequest();
+				xhr.open("GET", search_request, true);
+				xhr.onload = function (e) {
+				  	if (xhr.readyState === 4) {
+				    	if (xhr.status === 200) {
+
+		/*	COLLECT AND FORMAT IMAGES & METADATA*/
+
+
+
+					    	/* GATHER SEARCH RESULTS AND CREATE ARRAY OF ORIGINAL GIPH URLS */
+						    search_results.push(xhr.responseText);
+						    giph_src_array.push.apply(giph_src_array, search_results[0].match(giph_src_original_regex));
+
+						        /* CLEAN ARRAY SO EACH ELEMENT IS FORMATTED: "https://.... ... ... .giph" */
+
+						    giph_details_array = []
+						    giph_src_array.forEach(function(element) {
+						      	element_details = [];
+						      	element_details.push(cleanurl(between_strings(element,'height":"','"')));
+						      	element_details.push(cleanurl(between_strings(element,'width":"','"')));
+						      	element_details.push(cleanurl(between_strings(element,'url":"','"')));
+						      	element_details.push(cleanurl(between_strings(element,'mp4":"','"')));
+						      	giph_details_array.push(element_details);
+						    });
+
+		/*	POST GIPHS	*/
+
+					  resize_function();
+
+
+				    } else {
+				      console.error(xhr.statusText);
+				    }
+				  }
+				};
+				xhr.onerror = function (e) {
+				  console.error(xhr.statusText);
+				};
+				xhr.send(null);
+			}
+
+			giph_request();
 			
 
 			/*
@@ -97,5 +163,8 @@
 			(/original":{("url":".*?"),"width":"([0-9]*)","height":"([0-9]*)","size":"([0-9]*)/g)
 			*/
 		</script>
+	</head>
+	<body onresize = "resize_function()">
+
 	</body>
 </html>
