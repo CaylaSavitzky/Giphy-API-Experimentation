@@ -1,10 +1,26 @@
 
 <html>
+
+	<!--
+
+	Optional Action Items:
+	hover animation over gifs
+	onclick doing something with gifs
+	adding some type of heading?
+	
+	-->
 	<head>
 		<script>
 			var api_key = "ZiWvaBkvD0BNtOACTwJelb1CDZXJGWyE";
 		</script>
 		<style>
+			*:focus {
+				outline:none;
+			}
+			h1{
+				color:#66FF66;
+				text-align: center;
+			}
 			body {
 				background:black;
 				display: flex;
@@ -14,7 +30,6 @@
 			}
 			img, iframe {
 				border: 1px solid 777;
-				width:200px;
 				margin: 15px 0 15px 0;
 			}
 
@@ -22,18 +37,77 @@
 				margin:0 15px 0 15px;
 				width:200px;
 			}
+			.wide {
+				width:100%;
+			}
 
+			button {
+				background:black;
+				border: 1px solid #66FF66;
+				padding: 10 30 10 30;
+				color:#66FF66;
+				border-radius: 10px;
+				margin-left: 60%;
+			}
+
+			.search_holder{
+				position: relative;
+			}
+
+			.search_bar{
+				background:black;
+				border: 1px solid #66FF66;
+				padding: 10 30 10 30;
+				color:#66FF66;
+				margin-left:45px;
+				border-top-left-radius: 10px;
+				border-bottom-left-radius: 10px;
+				width: 60%;
+			}
+
+			.search_button {
+				background:black;
+				border: 1px solid #66FF66;
+				padding: 10 30 10 30;
+				color:#66FF66;
+				border-radius: 10px;
+				border-top-left-radius: 0px;
+				border-bottom-left-radius: 0px;
+				margin-left: 0;
+				position: relative;
+				right:45px;
+			}
 		</style>
 		<script>
 			var search_results = [];
 			var giphs_container = document.getElementsByClassName("giphs_container");
 			var giph_src_original_url_regex = /original":{("url":".*?")/g;
 			var giph_src_original_regex = /original":{.*?}/g;
-			var search_items = "kittens";
-			var view_number = 25;
-			var view_loads = 1;
+			var search_items = "cute+animals";
+			var view_number = 10;
+			var view_loads = 0;
 
-			var giph_src_array = []
+			var giph_original_array = [];
+			var giph_details = [];
+
+
+			var fruityRainbow = ["Radical Red","#FF355E",
+				"Wild Watermelon","#FD5B78",
+				"Outrageous Orange","#FF6037",
+				"Atomic Tangerine","#FF9966",
+				"Neon Carrot","#FF9933",
+				"Sunglow","#FFCC33",
+				"Laser Lemon","#FFFF66",
+				"Unmellow Yellow","#FFFF66",
+				"Electric Lime","#CCFF00",
+				"Screamin' Green","#66FF66",
+				"Magic Mint","#AAF0D1",
+				"Blizzard Blue","#50BFE6",
+				"Shocking Pink","#FF6EFF",
+				"Razzle Dazzle Rose","#EE34D2",
+				"Hot Magenta","#FF00CC",
+				"Purple Pizzazz","#FF00CC"]
+
 			function cleanurl (url)
 			{
 				var backslash_index = url.indexOf('\\');
@@ -67,9 +141,14 @@
 				}
 			}
 
+
+
 			function set_giphs_container (){
-			  	var body = document.body;
-			  	body.innerHTML = '';
+				var body_header = document.body.innerHTML;
+				body_header = body_header.slice(0,body_header.indexOf("</header>") + "</header>".length)
+				var body = ""
+				var body_footer = document.body.innerHTML;
+				body_footer = body_footer.slice(body_footer.indexOf("<footer"),body_footer.indexOf("</footer>") + "</footer>".length)
 			  	var two_col = 245;
 			  	var col_width = 230;
 			  	var col_number = 1;
@@ -80,68 +159,86 @@
 				  	next_total = two_col + col_number*col_width;
 				  	if (screenwidth < next_total){
 				  		for (i = 0; i < col_number; i++){
-				  			body.innerHTML = body.innerHTML + '<div class = "giphs_container"></div>';
+				  			body = body + '<div class = "giphs_container"></div>';
 				  		}
 				  	}
 				}
 				if (col_number == 1){
 				  		for (i = 0; i < col_number; i++){
-				  			body.innerHTML = body.innerHTML + '<div class = "giphs_container"></div>';
+				  			body = body + '<div class = "giphs_container"></div>';
 				  		}
 				  	}
+				document.body.innerHTML = body_header + body + body_footer;
 			  	var giphs_containers = document.getElementsByClassName("giphs_container");
-			  	return giphs_containers;
 			}
 
-			function distribute_giphs (giph_details_array,giphs_container){
-		  		var i = 0;
+
+
+
+			function distribute_giphs (){
+				var giphs_containers = document.getElementsByClassName("giphs_container");
 		  		var giph_columns = giphs_container.length;
+		  		var giph_containers_heights = [];
+		  		for(var n = 0; n < giph_columns; n++){
+		  			giph_containers_heights.push(0);
+		  		}
+
+
 		        /* POST GIPHS IN SUITABLE FASHION */
-		        giph_details_array.forEach(function(element){
-					giphs_container[i%giph_columns].innerHTML = giphs_container[i%giph_columns].innerHTML + '<img src=' + element[2] + '>';
+		   		var i = 0;
+		        giph_details.forEach(function(element){
+		        	var height = element[0]*200/element[1];
+		        	var smallest = 99999999999;
+		        	giph_containers_heights.forEach(function(element){if(element<smallest){smallest = element;}});
+		        	var smallest_item = giph_containers_heights.indexOf(smallest);
+
+		        	color = fruityRainbow[Math.floor(Math.random()*fruityRainbow.length/2)*2+1];
+					giphs_container[smallest_item].innerHTML = giphs_container[smallest_item].innerHTML + '<img src=' + element[2] + ' style = "width:200; height:' + height+ '; background:'+ color + ';">';
 					i++;
+					giph_containers_heights[smallest_item] = giph_containers_heights[smallest_item] + height +30;
 				});	
 			  }
 
+
+
+
 		  	function resize_function (){
 				if (test_resize_need() != giphs_container.length){
-				  	giphs_container = set_giphs_container();
-					distribute_giphs(giph_details_array,giphs_container);
+				  	set_giphs_container();
+					distribute_giphs();
 					console.log('resize');
 				}
 		  	}
+			
+			
 
-			function giph_request(items,number){
+			function giph_request(){
 				search_request = "http://api.giphy.com/v1/gifs/search?q="+search_items+"&api_key=" + api_key+ "&limit="+view_number;
+				if (view_loads > 0){
+					search_request = search_request + "&offset="+view_loads*view_number;
+				}
 				var xhr = new XMLHttpRequest();
-				xhr.open("GET", search_request, true);
+		  		xhr.open("GET", search_request, true);					
 				xhr.onload = function (e) {
-				  if (xhr.readyState === 4) {
-				    if (xhr.status === 200) {
+				  	if (xhr.readyState === 4) {
+				    	if (xhr.status === 200) {
+							
+							
+						    search_results.push(xhr.responseText);
+						    var filtered_results = search_results[view_loads].match(giph_src_original_regex);
+						    giph_original_array.push.apply(giph_original_array, filtered_results);
 
-		/*	COLLECT AND FORMAT IMAGES & METADATA*/
-
-				    	/* GATHER SEARCH RESULTS AND CREATE ARRAY OF ORIGINAL GIPH URLS */
-				      search_results.push(xhr.responseText);
-				      giph_src_array.push.apply(giph_src_array, search_results[0].match(giph_src_original_regex));
-
-				        /* CLEAN ARRAY SO EACH ELEMENT IS FORMATTED: "https://.... ... ... .giph" */
-
-				      giph_details_array = []
-				      giph_src_array.forEach(function(element) {
-				      	element_details = [];
-				      	element_details.push(cleanurl(between_strings(element,'height":"','"')));
-				      	element_details.push(cleanurl(between_strings(element,'width":"','"')));
-				      	element_details.push(cleanurl(between_strings(element,'url":"','"')));
-				      	element_details.push(cleanurl(between_strings(element,'mp4":"','"')));
-				      	giph_details_array.push(element_details);
-				      });
-
-		/*	POST GIPHS	*/
-
-					  resize_function();
-					  console.log(giph_details_array);
-
+						    filtered_results.forEach(function(element) {
+						      	element_details = [];
+						      	element_details.push(cleanurl(between_strings(element,'height":"','"')));
+						      	element_details.push(cleanurl(between_strings(element,'width":"','"')));
+						      	element_details.push(cleanurl(between_strings(element,'url":"','"')));
+						      	element_details.push(cleanurl(between_strings(element,'mp4":"','"')));
+						      	giph_details.push(element_details);
+						    });
+						set_giphs_container();
+						distribute_giphs();
+						view_loads++;
 
 				    } else {
 				      console.error(xhr.statusText);
@@ -153,17 +250,86 @@
 				};
 				xhr.send(null);
 			}
-
 			giph_request();
-			
-
 			/*
 			Regex for finding original giph
 			(/original":{("url":".*?"),"width":"([0-9]*)","height":"([0-9]*)","size":"([0-9]*)/g)
 			*/
+
+
+			function new_search(){
+				var search_bar_text = document.getElementsByClassName("search_bar")[0].value;
+				var search_bar_text_original = search_bar_text.substr(0);
+				var position = 0;
+				position = search_bar_text.indexOf(" ");
+				search_items = "";
+				var n = 0;
+				while (position != -1){
+					if (position == 0){
+						search_bar_text = search_bar_text.substr(position+1);
+					}
+					else{
+						search_items = search_items + "+" + search_bar_text.slice(0,position)
+						search_bar_text = search_bar_text.substr(position);
+					}
+					position = search_bar_text.indexOf(" ");
+					n = n +1;
+					if (n == 10){
+						position = -1;
+					}
+				}
+				search_items = search_items + "+" + search_bar_text;
+				search_items = search_items.slice(1);
+				
+				document.getElementsByClassName("search_bar")[0].defaultValue = search_bar_text_original;
+				console.log(document.getElementsByClassName("search_bar")[0].value);
+				view_loads = 0;
+
+				while (giph_original_array.length > 0)
+				{
+					giph_original_array.pop();
+				}
+				while (giph_details.length > 0)
+				{
+					giph_details.pop();
+				}
+				while (search_results.length > 0)
+				{
+					search_results.pop();
+				}
+				giph_request();
+			}
+
+
+		var j = [0,1,2,3,4,5]
+
+		function removej (){
+			while (j.length>0){
+				j.pop()
+			}
+		}
 		</script>
 	</head>
 	<body onresize = "resize_function()">
-
+		<header class = "wide">
+			<div>
+			</div>
+			<div class = "wide">
+				<h1>
+					Fake-Giphy Knock-Off
+				</h1>
+				<div class = "search_holder">
+					<input class = "search_bar" type="subject" value = "Cute Animals">
+					<button class = "search_button" onclick="new_search();">
+						Search
+					</button>
+				</div>
+			</div>
+		</header>
+		<div class = "giphs_containers_holder">
+		</div>
+		<footer class = "wide">
+			<button onclick="giph_request();">Load More</button>
+		</footer>
 	</body>
 </html>
