@@ -1,4 +1,4 @@
-
+<!doctype html>
 <html lang="en">
 <head>
 	<title> Giphy </title>
@@ -7,13 +7,15 @@
 	<meta charset="UTF-8">
 	<link rel="canonical" href="" />
 	<meta name="keywords" content="Giphy Single Page Application SPA CSS CSS3 HTML HTML5 Javascript AJAX Cayla Savitzky">
-	<meta name = "description" content = "A single page application that uses the Giphy API. This is a demo page by Cayla Savitzky, which utilises AJAX but no framework">
+	<meta name = "description" content = "A single page application that imitates Giphy. This is a demo page by Cayla Savitzky, which utilises AJAX but no framework">
 	<meta name="author" content="Cayla Savitzky">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
 
 	<!--
 	Possible reference material: 
 	https://developers.giphy.com/docs
+
 	
 	Optional Action Items:
 	hover animation over gifs
@@ -44,6 +46,7 @@
 				border: 1px solid 777;
 				margin: 15px 0 15px 0;
 			}
+
 			.giphs_container {
 				margin:0 15px 0 15px;
 				width:200px;
@@ -51,6 +54,7 @@
 			.wide {
 				width:100%;
 			}
+
 			button {
 				background:black;
 				border: 1px solid #66FF66;
@@ -59,25 +63,28 @@
 				border-radius: 10px;
 				margin-left: 60%;
 			}
+
 			.search_holder{
 				position: relative;
 				display: flex;
 				justify-content: center;
 			}
-			.search_bar{
+
+			#search_bar{
 				background:black;
 				border: 1px solid #66FF66;
-				padding: 10 30 10 30;
+				padding: 10px 30px 10px 30px;
 				color:#66FF66;
 				margin-left:45px;
 				border-top-left-radius: 10px;
 				border-bottom-left-radius: 10px;
 				width: 60%;
 			}
+
 			.search_button {
 				background:black;
 				border: 1px solid #66FF66;
-				padding: 10 30 10 30;
+				padding: 10px 30px 10px 30px;
 				color:#66FF66;
 				border-radius: 10px;
 				border-top-left-radius: 0px;
@@ -95,8 +102,11 @@
 			var search_items = "cute+animals";
 			var view_number = 10;
 			var view_loads = 0;
+
 			var giph_original_array = [];
 			var giph_details = [];
+
+
 			var fruityRainbow = ["Radical Red","#FF355E",
 				"Wild Watermelon","#FD5B78",
 				"Outrageous Orange","#FF6037",
@@ -113,6 +123,7 @@
 				"Razzle Dazzle Rose","#EE34D2",
 				"Hot Magenta","#FF00CC",
 				"Purple Pizzazz","#FF00CC"]
+
 			function cleanurl (url)
 			{
 				var backslash_index = url.indexOf('\\');
@@ -122,12 +133,14 @@
 			      }
 			    return url;
 			}
+
 			function between_strings(element, start_item,end_item)
 			{
 				var start_loc = element.indexOf(start_item) + start_item.length;
 			    var end_loc = element.indexOf(end_item,start_loc);
 			    return element.slice(start_loc,end_loc);
 			}
+
 			function test_resize_need (){
 				var two_col = 245;
 			  	var col_width = 230;
@@ -143,6 +156,9 @@
 				  	
 				}
 			}
+
+
+
 			function set_giphs_container (){
 				var body_header = document.body.innerHTML;
 				body_header = body_header.slice(0,body_header.indexOf("</header>") + "</header>".length)
@@ -171,6 +187,10 @@
 				document.body.innerHTML = body_header + body + body_footer;
 			  	var giphs_containers = document.getElementsByClassName("giphs_container");
 			}
+
+
+
+
 			function distribute_giphs (){
 				var giphs_containers = document.getElementsByClassName("giphs_container");
 		  		var giph_columns = giphs_container.length;
@@ -178,6 +198,8 @@
 		  		for(var n = 0; n < giph_columns; n++){
 		  			giph_containers_heights.push(0);
 		  		}
+
+
 		        /* POST GIPHS IN SUITABLE FASHION */
 		   		var i = 0;
 		        giph_details.forEach(function(element){
@@ -185,12 +207,17 @@
 		        	var smallest = 99999999999;
 		        	giph_containers_heights.forEach(function(element){if(element<smallest){smallest = element;}});
 		        	var smallest_item = giph_containers_heights.indexOf(smallest);
+
 		        	color = fruityRainbow[Math.floor(Math.random()*fruityRainbow.length/2)*2+1];
-					giphs_container[smallest_item].innerHTML = giphs_container[smallest_item].innerHTML + '<img src=' + element[2] + ' style = "width:200; height:' + height+ '; background:'+ color + ';">';
+					giphs_container[smallest_item].innerHTML = giphs_container[smallest_item].innerHTML + '<img src=' + element[2] + ' style = "width:200px; height:' + height+ 'px; background:'+ color + ';">';
 					i++;
 					giph_containers_heights[smallest_item] = giph_containers_heights[smallest_item] + height +30;
 				});	
 			  }
+
+
+
+
 		  	function resize_function (){
 				if (test_resize_need() != giphs_container.length){
 				  	set_giphs_container();
@@ -200,6 +227,7 @@
 		  	}
 			
 			
+
 			function giph_request(){
 				search_request = "http://api.giphy.com/v1/gifs/search?q="+search_items+"&api_key=" + api_key+ "&limit="+view_number;
 				if (view_loads > 0){
@@ -215,6 +243,7 @@
 						    search_results.push(xhr.responseText);
 						    var filtered_results = search_results[view_loads].match(giph_src_original_regex);
 						    giph_original_array.push.apply(giph_original_array, filtered_results);
+
 						    filtered_results.forEach(function(element) {
 						      	element_details = [];
 						      	element_details.push(cleanurl(between_strings(element,'height":"','"')));
@@ -226,6 +255,7 @@
 						set_giphs_container();
 						distribute_giphs();
 						view_loads++;
+
 				    } else {
 				      console.error(xhr.statusText);
 				    }
@@ -241,8 +271,10 @@
 			Regex for finding original giph
 			(/original":{("url":".*?"),"width":"([0-9]*)","height":"([0-9]*)","size":"([0-9]*)/g)
 			*/
+
+
 			function new_search(){
-				var search_bar_text = document.getElementsByClassName("search_bar")[0].value;
+				var search_bar_text = document.getElementById("search_bar").value;
 				var search_bar_text_original = search_bar_text.substr(0);
 				var position = 0;
 				position = search_bar_text.indexOf(" ");
@@ -265,9 +297,10 @@
 				search_items = search_items + "+" + search_bar_text;
 				search_items = search_items.slice(1);
 				
-				document.getElementsByClassName("search_bar")[0].defaultValue = search_bar_text_original;
-				console.log(document.getElementsByClassName("search_bar")[0].value);
+				document.getElementById("search_bar").defaultValue = search_bar_text_original;
+				console.log(document.getElementById("search_bar").value);
 				view_loads = 0;
+
 				while (giph_original_array.length > 0)
 				{
 					giph_original_array.pop();
@@ -282,11 +315,19 @@
 				}
 				giph_request();
 			}
+
+
 		var j = [0,1,2,3,4,5]
+
 		function removej (){
 			while (j.length>0){
 				j.pop()
 			}
+		}
+		function keyEventHandler(event){
+			if (event.keyCode === 13) {
+		   new_search();
+		  }
 		}
 		</script>
 	</head>
@@ -299,7 +340,7 @@
 					Fake-Giphy Knock-Off
 				</h1>
 				<div class = "search_holder">
-					<input class = "search_bar" type="subject" value = "Cute Animals">
+					<input id = "search_bar" type="subject" value = "Cute Animals" onkeypress = "keyEventHandler(event)">
 					<button class = "search_button" onclick="new_search();">
 						Search
 					</button>
